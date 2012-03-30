@@ -18,7 +18,9 @@ class CopraAuth {
      * @return string|FALSE
      */
     function login($user, $password){
-        return md5(uniqid('')); //Dummy, whoot!
+        return array(
+            'token' => md5(uniqid('')) //Dummy, whoot!
+        );
     }
 
     /**

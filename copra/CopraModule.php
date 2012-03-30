@@ -26,12 +26,12 @@ class CopraModule {
     /**
      * @var array This request methods are applicable to the object type itself.
      */
-    private $general_request_methods = array('GET', 'POST');
+    protected $general_request_methods = array('GET');
 
     /**
      * @var array This request methods are applicable to a specific identified object.
      */
-    private $specific_request_methods = array('GET', 'PUT', 'DELETE');
+    protected $specific_request_methods = array();
 
     /**
      * @var array List of class names which can be sub-connected to this object type.
@@ -71,8 +71,8 @@ class CopraModule {
      * @static
      * @return array
      */
-    public static function supported_connections() {
-        return self::connections;
+    public function connection_supported($connection) {
+        return in_array($connection, $this->connections);
     }
 
     /**
@@ -81,13 +81,13 @@ class CopraModule {
      * @param $with_id default FALSE
      * @return array
      */
-    public static function supported_requests($with_id = FALSE){
+    public function request_supported($request, $with_id = FALSE){
         if(!$with_id){
             //This request methods are valid if no specific object ID is given.
-            return self::general_request_methods;
+            return in_array($request, $this->general_request_methods);
         }
         //This request methods are valid, if a specific object ID is given.
-        return self::specific_request_methods;
+        return in_array($request, $this->specific_request_methods);
     }
 
 // =================================================================================================================
@@ -103,7 +103,7 @@ class CopraModule {
      * @param null $id
      * @return void
      */
-    public function get($id = NULL, $fields = NULL, $filter = NULL) {
+    public function get($id) {
     }
 
     /**
@@ -125,7 +125,8 @@ class CopraModule {
 
     /**
      * The delete function removes an object.
-     * Don't forget
+     * Don't forget to call the delete_children function to delegate the delete to the child classes (if there are any).
+     * Just call parent::delete($id);
      * @param $id
      * @return void
      */
