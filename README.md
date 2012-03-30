@@ -22,6 +22,17 @@ In your api.php file, you need to set up these simple lines to make Copra work:
 
 The "classes_folder" setting tells Copra where it can find the folder with the classes to match calls against.
 
+####Making variables and object publicly available inside the Copra architecture
+Sometimes you need a variable or object at hand in any of the dynamic classes - for example you create a database object to interact with your database.
+
+At any point after the creation of the Copra object, you can call the function "make_public($name, $var)" of the Copra class.
+This makes a reference of the variable/object available unter $copa->public->\[name\]
+
+In the case of a database object, you should make this public BEFORE you call the go() function of the copra object.
+
+You can call the make_public() function at any time inside you class constructs, by calling $this->copra->make_public();
+This is especially handy if you want to fetch userdata in the AuthClass' validate_token() function (see below) and make it publicly accessable in the whole object structure.
+
 ###The anatomy of a copra based API
 
 Copra handles your manipulatable data as objects, which are explicitely separated from each other. Copra allows you to quickly set up the common CRUD methods to read and manipulate your data - with no limitation to a common DBMS. Whether you want to use the classic MySQL, or MongoDB, or even plain files on your harddrive - there is no limitation in the use of Copra.
@@ -92,6 +103,11 @@ We recommend you fetching all request data that is transfered in the request bod
     $this->copra->request_data();
 
 inside your class. This will give you the request body, already interpreted as an associative array, like you know it from $_GET or $_POST.
+
+###Initializing your class
+To initialize your class and run any code before one of the request function is called, simply define a function "init()" inside your module class.
+
+You COULD create an __construct() class, but then you need to call the constructor of the parent class to keep everything in the works, so its simply easier to create an "init()" function for you.
 
 ##Authenticating users
 User authentication is already build into Copra and is handled in the class "CopraAuth".

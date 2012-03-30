@@ -9,6 +9,8 @@
  * @version: 1 11.03.2012
  */
 
+class CopraPublic{} //Used to create a empty Object.
+
 class Copra {
     private $request_data_cache = NULL;
     private $classes_folder = '';
@@ -19,12 +21,15 @@ class Copra {
     private $auth = NULL;
 
     var $request_method = '';
+    var $public = NULL;
 
     /**
      * The Copra Class Constructor.
      * @param array $params
      */
     function __construct($params = array()) {
+        $this->public = new CopraPublic();
+
         require('copra/CopraModule.php');
         require('copra/CopraAuth.php');
 
@@ -38,6 +43,17 @@ class Copra {
         if (isset($params['default_template'])) {
             $this->default_template = $params['default_template'];
         }
+    }
+
+    /**
+     * Makes a variable publicly available through $copra->public->[objectname]
+     * Be careful: if the object is already defined, it gets replaced.
+     * @param string $object_name
+     * @param mixed $object
+     * @return void
+     */
+    function make_public($object_name, $object){
+        $this->public->$object_name =& $object;
     }
 
     /**
@@ -90,7 +106,7 @@ class Copra {
             }
 
             if (!$this->load_class($path_elements[$i])) {
-                return $this->error('Unknown path components', '/' . $path_elements[$i], 404);
+                return $this->path_error($path_elements[$i]);
             }
 
             $id = NULL;
@@ -114,11 +130,16 @@ class Copra {
                     return $this->error('Unknown request method', $this->request_method, 405);
                 }
 
+                if(method_exists($classes[$last], 'init')){
+                    call_user_func(array($classes[$last], 'init'));
+                }
+
                 $result = call_user_func(array($classes[$last], strtolower($this->request_method)), $id);
 
                 if($result){
                     $this->render(array('success' => $result));
                 }
+                
             }
 
         }
@@ -201,6 +222,11 @@ class Copra {
         header('HTTP/1.1 ' . $status);
         $this->render($err);
         return FALSE;
+    }
+
+    function path_error($path = ''){
+        if($path) $path = '/' . $path;
+        return $this->error('Unknown path components', $path, 404);
     }
 
     /**
