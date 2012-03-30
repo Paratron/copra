@@ -8,10 +8,19 @@ The basic structure - understanding COPRA
 Every request to the Copra framework has to be made to the copra.php file.
 But since you want to use REST based URLs, a modRewrite rule in your .htaccess file is needed to make Copra work:
 
-    RewriteRule (.*) copra.php/$1 [L,QSA]
+    RewriteRule (.*) api.php/$1 [L,QSA]
 
 In this example, every call  will be mapped to the copra.php - you may want to change this rule to use just a subset or anything else.
 
+In your api.php file, you need to set up these simple lines to make Copra work:
+
+    require('copra/Copra.php');
+    $c = new Copra(array(
+                        'classes_folder' => 'classes/'
+                   ));
+    $c->go();
+
+The "classes_folder" setting tells Copra where it can find the folder with the classes to match calls against.
 
 ###The anatomy of a copra based API
 
@@ -53,5 +62,60 @@ This is optional (defaults to JSON). Wheter you add the extension “.json” or
 You can assign new extensions to different templates (for example for RSS or even HTML) to extend Copra for your needs.
 
 
-###The PHP Object Classes
+The PHP Object Classes
+----------------------
 We were already informed that Copra uses PHP classes to represent data objects.
+If you have set up copra in the same way we showed it in the example above, you have to put your REST classes inside the "classes/" folder.
+Lets create an example class:
+
+    class basic_object extends CopraModule{
+        function get($id){
+            return array('hello' => 'world');
+        }
+    }
+
+Thats it. You can call the class now performing a GET request to this URL:
+
+    [API_BASE]/basic_object
+
+Which will return you this JSON string:
+
+    {"success":{"hello":"world"}}
+
+Simply create a class method for every HTTP request method you want to fetch.
+The basic ones are POST, GET, PUT and DELETE.
+
+###Fetching the request body
+Fetching the request body for GET and POST requests can be done through PHPs normal magic variables $_GET and $_POST, altough this is not possible for PUT and DELETE requests (or other kinds of request).
+We recommend you fetching all request data that is transfered in the request body (thats the case for all requests, except GET), to use the function
+
+    $this->copra->request_data();
+
+inside your class. This will give you the request body, already interpreted as an associative array, like you know it from $_GET or $_POST.
+
+##Authenticating users
+User authentication is already build into Copra and is handled in the class "CopraAuth".
+The class has two pre-defined functions, which content you are always free to change to fit it to your needs.
+
+###login()
+The login() function is called, when the user makes a POST request to the API root.
+The example function in the CopraAuth.php requires the two parameters "$user" and "$password", but that can be changed to whatever parameter you would like to have submitted.
+
+Copra automatically checks which parameters your login() function awaits and if they are submitted inside the POST data.    
+If so, the login function gets called and passed all the necessary parameters.
+
+So if you rather want to use the parameters "$email" and "$password", just go for it.
+Or add a third parameter "$api_key" or whatever.
+
+Copra expects the function to return an array \["token" => "\[your access token\]"\].
+
+###validate_token()
+This function is called, whenever the GET parameter "token" is attached to the URL.
+It gets passed the access token for validation.
+Return an array with strings of permissions the user gets for using this token.
+
+Copra caches this permissions array and you can easily test for a specific permission by calling
+
+    $this->copra->has_permission($permission);
+
+from within your module classes, which will return you a true or false.
