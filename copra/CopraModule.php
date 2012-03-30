@@ -36,7 +36,7 @@ class CopraModule {
     /**
      * @var array List of class names which can be sub-connected to this object type.
      */
-    private $connections = array();
+    protected $connections = array();
 
     /**
      * The params array will always be passed on class creation.
@@ -111,7 +111,7 @@ class CopraModule {
      * @param array $data
      * @return void
      */
-    public function post($data) {
+    public function post($id) {
     }
 
     /**
@@ -120,7 +120,7 @@ class CopraModule {
      * @param $data
      * @return void
      */
-    public function put($id, $data) {
+    public function put($id) {
     }
 
     /**

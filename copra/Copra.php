@@ -81,7 +81,7 @@ class Copra {
 
         for ($i = 0; $i < $len; $i += 2) {
 
-            if($last){
+            if($last !== FALSE){
                 //Okay, there has already been a class instanced, so this should be a child class.
                 //Does the parent class support this child connection?
                 if(!$classes[$last]->connection_supported($path_elements[$i])){
@@ -100,7 +100,7 @@ class Copra {
             $params = array(
                 'copra' => &$this
             );
-            if($last){
+            if($last !== FALSE){
                 $params['parent'] = &$classes[$last];
                 $params['parent_id'] = $last_id;
             }
