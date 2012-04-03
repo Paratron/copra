@@ -11,6 +11,16 @@
  */
 
 class CopraAuth {
+    var $copra = NULL;
+
+    /**
+     * A reference to copra is passed in to enable you to use $copra->error().
+     * @param $copra_reference
+     */
+    function __construct($copra_reference){
+        $this->copra = $copra_reference;
+    }
+
     /**
      * The login function takes the login credentials and returns the access token for restricted actions, or false.
      * @param string $user

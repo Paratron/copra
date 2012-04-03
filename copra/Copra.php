@@ -33,7 +33,7 @@ class Copra {
         require('copra/CopraModule.php');
         require('copra/CopraAuth.php');
 
-        $this->auth = new CopraAuth();
+        $this->auth = new CopraAuth(&$this);
 
         if (isset($params['classes_folder'])) {
             $this->classes_folder = $params['classes_folder'];
