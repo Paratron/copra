@@ -100,7 +100,7 @@ class CopraModule {
      * If $fields != NULL, the function should only return the requested fields of the object(s)
      * If $filter != NULL, the function should only return
      *
-     * @param null $id
+     * @param mixed $id
      * @return void
      */
     public function get($id) {
@@ -108,16 +108,14 @@ class CopraModule {
 
     /**
      * This method should create new objects.
-     * @param array $data
      * @return void
      */
-    public function post($id) {
+    public function post() {
     }
 
     /**
      * The put method is used to overwrite data in existing objects.
      * @param $id
-     * @param $data
      * @return void
      */
     public function put($id) {
